@@ -378,7 +378,9 @@ every control.
 Look in /Programs:
 - CALC.BAS -- a calculator
 - CLOCK.BAS -- a clock
-- LANDER.BAS -- a game
+- LANDER.BAS -- land a ship on the pad
+- TANKS.BAS -- an artillery duel (with a computer opponent)
+- NITEMAZE.BAS -- a first-person maze chase
 
 Back to [BASIC quick reference](orbit:help/basic).
 `,

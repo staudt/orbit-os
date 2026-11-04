@@ -10,3 +10,16 @@ describe('BASIC smoke', () => {
     expect(r).toEqual({ output: ' 1  4  9 ' });
   });
 });
+
+describe('sample programs', () => {
+  it('every seeded .BAS program compiles', async () => {
+    const { m3Seeds } = await import('../../src/seed/m3');
+    const { M2_SEEDS } = await import('../../src/seed/m2');
+    const { compile } = await import('../../src/basic/compiler');
+    const progs = [...M2_SEEDS, ...m3Seeds()].filter((f) => f.path.endsWith('.BAS'));
+    expect(progs.length).toBeGreaterThan(10);
+    for (const f of progs) {
+      try { compile(f.content as string); } catch (e) { throw new Error(`${f.path}: ${(e as { format?: () => string }).format?.() ?? (e as Error).message}`); }
+    }
+  });
+});

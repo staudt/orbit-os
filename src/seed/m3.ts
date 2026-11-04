@@ -4,6 +4,7 @@ import { encodePic } from '../fs/pic';
 import { TUNE_SEEDS } from './tunes';
 import { M4_SEEDS } from './m4';
 import { SCREENSAVER_SEEDS } from './m5';
+import { GAME_SEEDS } from './games';
 
 const BUDGET = `Item,Jan,Feb,Mar,Total
 Rent,650,650,650,=B2+C2+D2
@@ -30,5 +31,6 @@ export function m3Seeds(): SeedFile[] {
     ...TUNE_SEEDS,
     ...M4_SEEDS,
     ...SCREENSAVER_SEEDS,
+    ...GAME_SEEDS,
   ];
 }

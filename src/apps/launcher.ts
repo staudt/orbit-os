@@ -22,7 +22,7 @@ interface Item {
 }
 interface Category { name: string; icon: string; items: () => Item[] }
 
-const GAMES = ['GUESS.BAS', 'LANDER.BAS'];
+const GAMES = ['GUESS.BAS', 'LANDER.BAS', 'TANKS.BAS', 'NITEMAZE.BAS'];
 
 const app = (id: string, label?: string): Item | null => {
   const a = getApp(id);
