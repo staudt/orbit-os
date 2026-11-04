@@ -107,6 +107,11 @@ export class Desktop {
     invalidate();
   }
 
+  /** Screen areas taken by desktop icons (for window placement). */
+  iconRects(): Rect[] {
+    return this.icons.map((ic) => this.hitRect(ic));
+  }
+
   private iconRect(ic: DeskIcon): Rect {
     return { x: ic.x + (CELL_W - 32) / 2, y: ic.y, w: 32, h: 32 };
   }

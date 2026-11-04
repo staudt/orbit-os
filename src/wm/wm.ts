@@ -133,11 +133,7 @@ export class WindowManager implements InputSink {
         x = ref.x + Math.floor((ref.w - w) / 2);
         y = ref.y + Math.max(0, Math.floor((ref.h - h) / 3));
       } else {
-        const step = this.cascade++ % 8;
-        x = 24 + step * 16;
-        y = D.y + 10 + step * 14;
-        if (x + w > D.w) x = Math.max(0, D.w - w - 4);
-        if (y + h > D.y + D.h) y = Math.max(D.y, D.y + D.h - h - 2);
+        [x, y] = this.smartPlace(w, h);
       }
     }
     w = Math.max(w, win.minW + 2);
@@ -158,6 +154,45 @@ export class WindowManager implements InputSink {
   refreshCursor() {
     const p = this.lastPointer;
     if (p && !this.drag) this.updateHover({ ...p, type: 'move' });
+  }
+
+  /**
+   * Smart (minimum-overlap) placement, as in fvwm and KDE's KWin: try positions along the
+   * edges of the desktop and of existing windows, pick the one that covers the least of
+   * the windows already on screen (desktop icons count half), ties going to the top-left.
+   */
+  smartPlace(w: number, h: number): [number, number] {
+    const D = this.deskRect();
+    const gap = 6;
+    const wins = this.windows.filter((o) => o.visible && !o.popup && !o.closed).map((o) => o.frame);
+    const icons = this.desktop.iconRects();
+    const xs = new Set<number>([D.x + gap, D.x + D.w - w - gap]);
+    const ys = new Set<number>([D.y + gap, D.y + D.h - h - gap]);
+    for (const r of [...wins, ...icons]) {
+      xs.add(r.x + r.w + gap); xs.add(r.x - w - gap); xs.add(r.x);
+      ys.add(r.y + r.h + gap); ys.add(r.y - h - gap); ys.add(r.y);
+    }
+    const area = (a: Rect, x: number, y: number) => {
+      const ox = Math.min(a.x + a.w, x + w) - Math.max(a.x, x);
+      const oy = Math.min(a.y + a.h, y + h) - Math.max(a.y, y);
+      return ox > 0 && oy > 0 ? ox * oy : 0;
+    };
+    let best: [number, number] | null = null, bestScore = Infinity;
+    const sortedY = [...ys].sort((a, b) => a - b), sortedX = [...xs].sort((a, b) => a - b);
+    for (const y of sortedY) {
+      if (y < D.y || y + h > D.y + D.h) continue;
+      for (const x of sortedX) {
+        if (x < D.x || x + w > D.x + D.w) continue;
+        let score = 0;
+        for (const r of wins) score += area(r, x, y);
+        for (const r of icons) score += area(r, x, y) * 0.5;
+        if (score < bestScore) { bestScore = score; best = [x, y]; }
+      }
+    }
+    if (best) return best;
+    // larger than the free area: fall back to a gentle cascade
+    const step = this.cascade++ % 8;
+    return [Math.max(0, Math.min(D.w - w, 24 + step * 16)), Math.max(D.y, Math.min(D.y + D.h - h, D.y + 10 + step * 14))];
   }
 
   private get animOn() {
