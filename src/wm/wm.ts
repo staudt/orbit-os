@@ -465,6 +465,9 @@ export class WindowManager implements InputSink {
     // any input wakes the screensaver (and that input is not passed on)
     if (this.screensaver.poke()) { this.drag = null; return; }
     this.lastPointer = e;
+    // fingers don't need an arrow: hide the cursor while using touch
+    const showCursor = !e.touch;
+    if (os.display.cursorVisible !== showCursor) { os.display.cursorVisible = showCursor; invalidate(); }
     if (this.fileDrag && e.type === 'move') invalidate();
     os.display.cursorX = e.x;
     os.display.cursorY = e.y;

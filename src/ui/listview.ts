@@ -235,7 +235,7 @@ export class ListView extends Widget {
       this.focusIdx = i;
     }
     this.onSelect?.(this.selectedItems);
-    if (e.clicks === 2) { this.onActivate?.(this.selectedItems); this.press = null; }
+    if (e.clicks === 2 && !e.touch) { this.onActivate?.(this.selectedItems); this.press = null; }
     else this.press = { x: e.lx, y: e.ly, id: item.id, moved: false, band: false };
     this.invalidate();
     return true;
@@ -254,6 +254,11 @@ export class ListView extends Widget {
     this.press = null;
     if (!p) return;
     if (p.moved && p.id) this.onDragEnd?.(e.lx, e.ly);
+    // touch: a single tap on an item opens it when the finger lifts
+    else if (e.touch && !e.synthetic && p.id && this.indexAt(e.lx, e.ly) >= 0 && this.items[this.indexAt(e.lx, e.ly)].id === p.id) {
+      this.select([p.id]);
+      this.onActivate?.(this.selectedItems);
+    }
     else if (!p.moved && p.id && !e.ctrl && !e.shift && this.selected.size > 1) {
       // click on one of several selected items narrows the selection
       this.select([p.id]);

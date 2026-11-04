@@ -36,6 +36,7 @@ export class Desktop {
   private drag: { start: [number, number]; moved: boolean; offsets: Map<string, [number, number]>; target: DeskIcon | null } | null = null;
   private band: { x0: number; y0: number; x1: number; y1: number } | null = null;
   private typeBuf = '';
+  private tapKey: string | null = null;
   private typeTime = 0;
 
   /** Rebuild the icon list from /Desktop and place icons. */
@@ -212,10 +213,11 @@ export class Desktop {
         if (this.selected.has(ic.key)) this.selected.delete(ic.key);
         else this.selected.add(ic.key);
       } else if (!this.selected.has(ic.key)) this.selected = new Set([ic.key]);
-      if (e.clicks === 2) {
+      if (e.clicks === 2 && !e.touch) {
         this.open(ic);
         return;
       }
+      this.tapKey = e.touch ? ic.key : null;
       const offsets = new Map<string, [number, number]>();
       for (const s of this.icons) if (this.selected.has(s.key)) offsets.set(s.key, [e.x - s.x, e.y - s.y]);
       this.drag = { start: [e.x, e.y], moved: false, offsets, target: null };
@@ -240,7 +242,18 @@ export class Desktop {
       if (this.band) { this.band = null; invalidate(); return; }
       const d = this.drag;
       this.drag = null;
-      if (!d || !d.moved) { invalidate(); return; }
+      if (!d || !d.moved) {
+        // touch: a single tap opens the icon when the finger lifts (if it didn't drag)
+        const tap = this.tapKey;
+        this.tapKey = null;
+        if (e.touch && !e.synthetic && tap) {
+          const ic = this.iconAt(e.x, e.y);
+          if (ic && ic.key === tap) this.open(ic);
+        }
+        invalidate();
+        return;
+      }
+      this.tapKey = null;
       const dropWin = os.wm.windowAt(e.x, e.y);
       if (d.target) this.dropOnto(d.target);
       else if (dropWin) this.dropOnWindow(dropWin.win, e.x, e.y);

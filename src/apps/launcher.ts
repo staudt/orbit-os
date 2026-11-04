@@ -1,5 +1,5 @@
 import { registerApp, launch, openPath, iconForPath, getApp } from './registry';
-import { Window, BODY_X, BODY_Y } from '../wm/window';
+import { Window, BODY_X, BODY_Y, CHROME_W } from '../wm/window';
 import { Widget, type WEvent } from '../ui/widget';
 import { Label, ScrollBar, TextField } from '../ui/widgets';
 import type { Gfx, Rect } from '../core/gfx';
@@ -221,9 +221,11 @@ function score(it: Item, q: string): number {
 
 function openLauncher() {
   const tb = os.wm.taskbar.launchRect();
+  // on screens narrower than the launcher (phones), it fills the desktop
+  const narrow = os.wm.deskRect().w < 404 + CHROME_W + 8;
   const win = new Window({
-    title: 'Orbit Launcher', icon: 'orbit', app: 'launcher', w: 404, h: 236, minW: 300, minH: 180,
-    popup: true, titleHint: 'F9', center: true,
+    title: 'Orbit Launcher', icon: 'orbit', app: 'launcher', w: 404, h: 236, minW: 200, minH: 180,
+    popup: true, titleHint: 'F9', center: !narrow, ...(narrow ? { fit: { w: 1, h: 1 } } : {}),
   });
   current = win;
   win.closeTarget = tb;
