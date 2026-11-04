@@ -381,6 +381,10 @@ Look in /Programs:
 - LANDER.BAS -- land a ship on the pad
 - TANKS.BAS -- an artillery duel (with a computer opponent)
 - NITEMAZE.BAS -- a first-person maze chase
+- TRADER.BAS -- a space trading game (saves to /Documents)
+- WORM.BAS -- the classic snake, for one or two players
+- MINES.BAS -- clear the star-mine meadow (mouse or keyboard)
+- ADVENTUR.BAS -- a text adventure inside this very computer
 
 Back to [BASIC quick reference](orbit:help/basic).
 `,

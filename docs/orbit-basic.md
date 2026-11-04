@@ -111,7 +111,7 @@ PRINT Square(4)
 
 ## Screen, graphics and color
 - Each running program gets a window with a 320×200, 16-color screen. `SCREEN w, h` resizes it, up to 640×400.
-- Text uses an 8-pixel character grid: 53 columns by 20 rows at 320×200. `CLS` clears, `LOCATE row, col` moves the cursor, and `COLOR fg[, bg]` sets colors 0–15. `CSRLIN` and `POS(0)` give the cursor position.
+- Text uses 6×10-pixel character cells: 53 columns by 20 rows at 320×200. `CLS` clears, `LOCATE row, col` moves the cursor, and `COLOR fg[, bg]` sets colors 0–15. `CSRLIN` and `POS(0)` give the cursor position.
 - Graphics:
   - `PSET (x, y)[, c]`, `PRESET (x, y)`.
   - `LINE [(x1, y1)]-(x2, y2)[, c][, B|BF]` (`B` = box, `BF` = filled box).

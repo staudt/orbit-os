@@ -12,7 +12,7 @@ export interface SeedFile {
 }
 
 /** Bump when new sample files/shortcuts ship, so existing disks get them too. */
-export const SEED_VERSION = 7;
+export const SEED_VERSION = 8;
 
 /** Files renamed by later versions (applied once when upgrading past `since`). */
 export const SEED_RENAMES: { since: number; from: string; to: string }[] = [

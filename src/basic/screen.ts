@@ -235,6 +235,13 @@ export class BasicScreen implements BasicHost {
   readLine(): Promise<string> {
     return new Promise((resolve) => {
       this.input = { buf: '', resolve };
+      // type-ahead: keys typed before INPUT started belong to it (like a real keyboard buffer)
+      while (this.input && this.keys.length) {
+        const k = this.keys.shift()!;
+        if (k === '\r') this.keySpecial('Enter');
+        else if (k === '\b') this.keySpecial('Backspace');
+        else if (k.length === 1 && k >= ' ') this.keyText(k);
+      }
       this.changed();
     });
   }

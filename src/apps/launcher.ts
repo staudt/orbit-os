@@ -9,6 +9,7 @@ import { icon, T as TRANSPARENT } from '../core/icons';
 import type { KeyEv } from '../core/input';
 import { TH, softRect } from '../ui/theme';
 import { basename, extname, joinPath, TRASH } from '../fs/vfs';
+import { GAME_FILES } from '../seed/games';
 import { invalidate, os } from '../os';
 
 interface Item {
@@ -22,7 +23,7 @@ interface Item {
 }
 interface Category { name: string; icon: string; items: () => Item[] }
 
-const GAMES = ['GUESS.BAS', 'LANDER.BAS', 'TANKS.BAS', 'NITEMAZE.BAS'];
+const GAMES = GAME_FILES;
 
 const app = (id: string, label?: string): Item | null => {
   const a = getApp(id);
