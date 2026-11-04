@@ -20,10 +20,11 @@ describe('screen layout never stretches', () => {
     expect(L.cssW / L.cssH).toBeCloseTo(L.w / L.h, 6);
   });
 
-  it('targets ~480 logical rows on common screens', () => {
-    expect(computeLayout(2560, 1440, 1).h).toBe(480);
-    expect(computeLayout(1920, 1080, 1).h).toBe(540);
-    expect(computeLayout(1280, 720, 1).h).toBe(360);
+  it('prefers 4x pixels, stepping down when the desktop would be too small', () => {
+    expect(computeLayout(2560, 1440, 1)).toMatchObject({ scale: 4, w: 640, h: 360 });
+    expect(computeLayout(3840, 2160, 1)).toMatchObject({ scale: 4, w: 960, h: 540 });
+    expect(computeLayout(1920, 1080, 1)).toMatchObject({ scale: 3, w: 640, h: 360 });
+    expect(computeLayout(1280, 720, 1)).toMatchObject({ scale: 2, w: 640, h: 360 });
   });
 
   it('changes shape with the viewport instead of stretching', () => {
@@ -42,8 +43,8 @@ describe('per-monitor pixel size', () => {
   const qhd = { w: 2560, h: 1440, phone: false };
   it('keeps the same pixel size when the browser window changes size', () => {
     const full = computeLayout(2560, 1440, 1, 0, qhd);
-    const windowed = computeLayout(1800, 1000, 1, 0, qhd);
-    expect(full.scale).toBe(3);
+    const windowed = computeLayout(2000, 1300, 1, 0, qhd);
+    expect(full.scale).toBe(4);
     expect(windowed.scale).toBe(full.scale);
     expect(windowed.w).toBeLessThan(full.w); // less desktop, same pixels
   });

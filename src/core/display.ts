@@ -1,7 +1,6 @@
 import { Surface } from './gfx';
 import { paletteLUT } from './palette';
 
-export const TARGET_H = 480;
 /** Smallest desktop (in Orbit pixels) that is still comfortable to use; smaller windows get smaller pixels. */
 export const MIN_W = 400;
 export const MIN_H = 300;
@@ -32,19 +31,15 @@ export interface MonitorInfo {
   phone: boolean;
 }
 
+/** The preferred size of an Orbit pixel, in device pixels (the "sweet spot" on desktops and phones). */
+export const PREFERRED_SCALE = 4;
+
 /**
- * The preferred pixel size for a monitor. It depends on the monitor, not the window,
- * so resizing the browser changes how much desktop you get, not how big the pixels are.
- * - Desktops: a full-screen window is about 480 Orbit pixels tall.
- * - Phones: one third bigger pixels than that rule gives (things stay readable by touch).
+ * The preferred pixel size. It doesn't depend on the window, so resizing the browser changes
+ * how much desktop you get, not how big the pixels are (until the desktop would be too small).
  */
-export function monitorScale(mon: MonitorInfo, dpr: number): number {
-  const long = Math.max(mon.w, mon.h) * dpr, short = Math.min(mon.w, mon.h) * dpr;
-  if (!mon.phone) return Math.max(1, Math.round((mon.h * dpr) / TARGET_H));
-  // the old phone rule (portrait, ~480 tall but at least 320 wide), then 1/3 bigger
-  let s = Math.max(1, Math.round(long / TARGET_H));
-  while (s > 1 && short / s < 320) s--;
-  return Math.max(1, Math.round((s * 4) / 3));
+export function monitorScale(_mon: MonitorInfo, _dpr: number): number {
+  return PREFERRED_SCALE;
 }
 
 /** Pick an integer scale: the monitor's preferred size, stepped down until the desktop is usable. */

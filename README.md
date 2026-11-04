@@ -1,6 +1,6 @@
 # Orbit Personal System
 
-A 90s-style desktop operating system that runs entirely in the browser: a static site with no server. Everything is drawn into one low-resolution, 16-color framebuffer. The screen is about 480 pixels tall and scaled up by a whole number with square pixels, and it changes shape with the browser window instead of stretching.
+A 90s-style desktop operating system that runs entirely in the browser: a static site with no server. Everything is drawn into one low-resolution, 16-color framebuffer. Each Orbit pixel is 4×4 screen pixels (smaller only when the window would be too cramped), and the desktop changes shape with the browser window instead of stretching.
 
 ## What's inside
 
