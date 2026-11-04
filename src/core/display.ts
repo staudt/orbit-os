@@ -2,8 +2,12 @@ import { Surface } from './gfx';
 import { paletteLUT } from './palette';
 
 export const TARGET_H = 480;
-export const MIN_H = 360;
-export const MIN_W = 320;
+/** Smallest desktop (in Orbit pixels) that is still comfortable to use; smaller windows get smaller pixels. */
+export const MIN_W = 400;
+export const MIN_H = 300;
+/** Phones accept a slightly narrower desktop so things can be bigger. */
+export const PHONE_MIN_W = 280;
+export const PHONE_MIN_H = 240;
 
 export interface ScreenLayout {
   /** integer device pixels per logical pixel */
@@ -21,10 +25,34 @@ export interface ScreenLayout {
   cssTop: number;
 }
 
-/** Pick an integer scale so the logical height lands near 480 without dropping below ~360. */
-export function autoScale(devW: number, devH: number): number {
-  let s = Math.max(1, Math.round(devH / TARGET_H));
-  while (s > 1 && (devH / s < MIN_H || devW / s < MIN_W)) s--;
+/** The physical display the window is on (CSS px), and whether it's a phone. */
+export interface MonitorInfo {
+  w: number;
+  h: number;
+  phone: boolean;
+}
+
+/**
+ * The preferred pixel size for a monitor. It depends on the monitor, not the window,
+ * so resizing the browser changes how much desktop you get, not how big the pixels are.
+ * - Desktops: a full-screen window is about 480 Orbit pixels tall.
+ * - Phones: one third bigger pixels than that rule gives (things stay readable by touch).
+ */
+export function monitorScale(mon: MonitorInfo, dpr: number): number {
+  const long = Math.max(mon.w, mon.h) * dpr, short = Math.min(mon.w, mon.h) * dpr;
+  if (!mon.phone) return Math.max(1, Math.round((mon.h * dpr) / TARGET_H));
+  // the old phone rule (portrait, ~480 tall but at least 320 wide), then 1/3 bigger
+  let s = Math.max(1, Math.round(long / TARGET_H));
+  while (s > 1 && short / s < 320) s--;
+  return Math.max(1, Math.round((s * 4) / 3));
+}
+
+/** Pick an integer scale: the monitor's preferred size, stepped down until the desktop is usable. */
+export function autoScale(devW: number, devH: number, mon?: MonitorInfo, dpr = 1): number {
+  const monitor = mon ?? { w: devW / dpr, h: devH / dpr, phone: false };
+  let s = monitorScale(monitor, dpr);
+  const minW = monitor.phone ? PHONE_MIN_W : MIN_W, minH = monitor.phone ? PHONE_MIN_H : MIN_H;
+  while (s > 1 && (devW / s < minW || devH / s < minH)) s--;
   return s;
 }
 
@@ -32,10 +60,10 @@ export function autoScale(devW: number, devH: number): number {
  * Pure layout math: the logical screen always uses square, integer-sized pixels.
  * The desktop changes shape with the viewport instead of stretching.
  */
-export function computeLayout(cssW: number, cssH: number, dpr: number, scaleOverride = 0): ScreenLayout {
+export function computeLayout(cssW: number, cssH: number, dpr: number, scaleOverride = 0, mon?: MonitorInfo): ScreenLayout {
   const devW = Math.max(1, Math.round(cssW * dpr));
   const devH = Math.max(1, Math.round(cssH * dpr));
-  let scale = scaleOverride > 0 ? scaleOverride : autoScale(devW, devH);
+  let scale = scaleOverride > 0 ? scaleOverride : autoScale(devW, devH, mon, dpr);
   // never let an override produce a uselessly tiny screen
   while (scale > 1 && (devW / scale < 200 || devH / scale < 150)) scale--;
   const w = Math.floor(devW / scale);
@@ -49,6 +77,19 @@ export function computeLayout(cssW: number, cssH: number, dpr: number, scaleOver
     cssLeft: leftDev / dpr,
     cssTop: topDev / dpr,
   };
+}
+
+/** Describe the current monitor from the browser (CSS px). */
+export function currentMonitor(): MonitorInfo {
+  const rawW = window.screen?.width || window.innerWidth, rawH = window.screen?.height || window.innerHeight;
+  const coarse = typeof matchMedia === 'function' && matchMedia('(pointer: coarse)').matches;
+  // a touch device whose short side is phone-sized; tablets behave like desktops
+  const phone = coarse && Math.min(rawW, rawH) < 600;
+  // never smaller than the window itself (some browsers under-report the screen)
+  const sw = Math.max(rawW, phone ? 0 : window.innerWidth);
+  const sh = Math.max(rawH, phone ? 0 : window.innerHeight);
+  // use the landscape height on desktops (monitors are normally landscape)
+  return phone ? { w: sw, h: sh, phone } : { w: Math.max(sw, sh), h: Math.min(sw, sh), phone };
 }
 
 export interface CursorImage {
@@ -111,7 +152,7 @@ export class Display {
 
   relayout() {
     const vw = window.innerWidth, vh = window.innerHeight;
-    const L = computeLayout(vw, vh, window.devicePixelRatio || 1, this.scaleOverride);
+    const L = computeLayout(vw, vh, window.devicePixelRatio || 1, this.scaleOverride, currentMonitor());
     const prev = this.layout;
     const st = this.canvas.style;
     st.position = 'absolute';

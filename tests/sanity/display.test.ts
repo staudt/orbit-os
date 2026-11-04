@@ -37,3 +37,29 @@ describe('screen layout never stretches', () => {
     expect(computeLayout(640, 480, 1, 6).scale).toBeLessThan(6);
   });
 });
+
+describe('per-monitor pixel size', () => {
+  const qhd = { w: 2560, h: 1440, phone: false };
+  it('keeps the same pixel size when the browser window changes size', () => {
+    const full = computeLayout(2560, 1440, 1, 0, qhd);
+    const windowed = computeLayout(1800, 1000, 1, 0, qhd);
+    expect(full.scale).toBe(3);
+    expect(windowed.scale).toBe(full.scale);
+    expect(windowed.w).toBeLessThan(full.w); // less desktop, same pixels
+  });
+  it('steps down in windows too small to use, so the desktop stays spacious', () => {
+    const big = { w: 3840, h: 2160, phone: false };
+    const L = computeLayout(800, 600, 1, 0, big);
+    expect(L.w).toBeGreaterThanOrEqual(400);
+    expect(L.h).toBeGreaterThanOrEqual(300);
+    expect(L.scale).toBe(2);
+  });
+  it('makes phones a third bigger than the plain rule', () => {
+    const phone = { w: 390, h: 844, phone: true };
+    expect(computeLayout(390, 844, 3, 0, phone)).toMatchObject({ scale: 4, w: 292, h: 633 });
+    // landscape still fits
+    const land = computeLayout(844, 390, 3, 0, phone);
+    expect(land.scale).toBe(4);
+    expect(land.h).toBeGreaterThanOrEqual(240);
+  });
+});

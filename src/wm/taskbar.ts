@@ -31,7 +31,7 @@ export class Taskbar {
   /** The bar spans ~50% of the screen width (at least 480px), centered; full width on narrow screens. */
   barRect(): Rect {
     const W = os.display.layout.w;
-    const w = W >= 800 ? Math.max(480, Math.round(W * 0.5)) : W;
+    const w = W >= 560 ? Math.min(W, Math.max(480, Math.round(W * 0.5))) : W;
     return { x: Math.floor((W - w) / 2), y: this.y, w, h: TASKBAR_H };
   }
   contains(x: number, y: number): boolean {
