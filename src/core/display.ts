@@ -31,15 +31,16 @@ export interface MonitorInfo {
   phone: boolean;
 }
 
-/** The preferred size of an Orbit pixel, in device pixels (the "sweet spot" on desktops and phones). */
-export const PREFERRED_SCALE = 4;
+/** The preferred size of an Orbit pixel, in device pixels (the "sweet spot"): 3 on desktops, 4 on phones. */
+export const DESKTOP_SCALE = 3;
+export const PHONE_SCALE = 4;
 
 /**
  * The preferred pixel size. It doesn't depend on the window, so resizing the browser changes
  * how much desktop you get, not how big the pixels are (until the desktop would be too small).
  */
-export function monitorScale(_mon: MonitorInfo, _dpr: number): number {
-  return PREFERRED_SCALE;
+export function monitorScale(mon: MonitorInfo, _dpr: number): number {
+  return mon.phone ? PHONE_SCALE : DESKTOP_SCALE;
 }
 
 /** Pick an integer scale: the monitor's preferred size, stepped down until the desktop is usable. */

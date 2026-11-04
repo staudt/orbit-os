@@ -20,9 +20,9 @@ describe('screen layout never stretches', () => {
     expect(L.cssW / L.cssH).toBeCloseTo(L.w / L.h, 6);
   });
 
-  it('prefers 4x pixels, stepping down when the desktop would be too small', () => {
-    expect(computeLayout(2560, 1440, 1)).toMatchObject({ scale: 4, w: 640, h: 360 });
-    expect(computeLayout(3840, 2160, 1)).toMatchObject({ scale: 4, w: 960, h: 540 });
+  it('prefers 3x pixels on desktops, stepping down when the desktop would be too small', () => {
+    expect(computeLayout(2560, 1440, 1)).toMatchObject({ scale: 3, w: 853, h: 480 });
+    expect(computeLayout(3840, 2160, 1)).toMatchObject({ scale: 3, w: 1280, h: 720 });
     expect(computeLayout(1920, 1080, 1)).toMatchObject({ scale: 3, w: 640, h: 360 });
     expect(computeLayout(1280, 720, 1)).toMatchObject({ scale: 2, w: 640, h: 360 });
   });
@@ -44,7 +44,7 @@ describe('per-monitor pixel size', () => {
   it('keeps the same pixel size when the browser window changes size', () => {
     const full = computeLayout(2560, 1440, 1, 0, qhd);
     const windowed = computeLayout(2000, 1300, 1, 0, qhd);
-    expect(full.scale).toBe(4);
+    expect(full.scale).toBe(3);
     expect(windowed.scale).toBe(full.scale);
     expect(windowed.w).toBeLessThan(full.w); // less desktop, same pixels
   });
@@ -55,7 +55,7 @@ describe('per-monitor pixel size', () => {
     expect(L.h).toBeGreaterThanOrEqual(300);
     expect(L.scale).toBe(2);
   });
-  it('makes phones a third bigger than the plain rule', () => {
+  it('uses 4x pixels on phones', () => {
     const phone = { w: 390, h: 844, phone: true };
     expect(computeLayout(390, 844, 3, 0, phone)).toMatchObject({ scale: 4, w: 292, h: 633 });
     // landscape still fits
