@@ -104,7 +104,7 @@ export class Taskbar {
     if (lp) g.fillRect(lr.x + 2, lr.y + 2, lr.w - 4, lr.h - 4, C.ORANGE);
     const o = lp ? 1 : 0;
     drawPlanet(g, lr.x + 10 + o, lr.y + 8 + o, 4, { gaps: false, ringColor: C.PLUM });
-    SANS.draw(g, lr.x + 19 + o, lr.y + 3 + o, 'Launch', TH.text, { bold: true });
+    SANS.draw(g, lr.x + 19 + o, lr.y + 4 + o, 'Launch', TH.text, { bold: true });
     g.vline(lr.x + LAUNCH_W + 2, y + 4, y + TASKBAR_H - 4, C.TAN);
     for (const s of this.slots) {
       const active = os.wm.active === s.win || (os.wm.active?.modalFor === s.win);
@@ -125,14 +125,14 @@ export class Taskbar {
       if (!s.iconOnly) {
         g.clip(x, by, w - 3, h);
         const t = SANS.fit(s.win.title, w - 26, { bold: active });
-        SANS.draw(g, x + 22 + o2, by + 3 + o2, t, s.win.state === 'minimized' ? C.GREY : TH.text, { bold: active });
+        SANS.draw(g, x + 22 + o2, by + 4 + o2, t, s.win.state === 'minimized' ? C.GREY : TH.text, { bold: active });
         g.pop();
       }
     }
     const mr = this.moreRect();
     if (mr) {
       buttonFace(g, mr.x, mr.y, mr.w, mr.h, this.pressed === 'more');
-      SANS.draw(g, mr.x + 5, mr.y + 3, `+${this.overflow.length}`, TH.text, { bold: true });
+      SANS.draw(g, mr.x + 5, mr.y + 4, `+${this.overflow.length}`, TH.text, { bold: true });
     }
   }
 
