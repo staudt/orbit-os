@@ -1,0 +1,16 @@
+{
+  "hooks": {
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "input=$(cat); cd \"${CLAUDE_PROJECT_DIR:-.}\" || exit 0; out=$(npm run sanity --silent 2>&1) && exit 0; if [ \"$(printf %s \"$input\" | jq -r \".stop_hook_active // false\")\" = \"true\" ]; then printf \"Orbit sanity checks still failing:\\n%s\\n\" \"$(printf %s \"$out\" | tail -30)\" >&2; exit 0; fi; printf \"Orbit sanity checks failed (npm run sanity):\\n%s\\n\" \"$(printf %s \"$out\" | tail -40)\" >&2; exit 2",
+            "timeout": 120,
+            "statusMessage": "Running Orbit sanity checks\u2026"
+          }
+        ]
+      }
+    ]
+  }
+}
