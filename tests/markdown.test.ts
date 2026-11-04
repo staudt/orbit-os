@@ -21,3 +21,13 @@ describe('browser markdown', () => {
     expect(normalizeInput('retro computers')).toMatch(/duckduckgo.*retro%20computers/);
   });
 });
+
+import { looksLikeUrl } from '../src/apps/launcher';
+describe('quick run address detection', () => {
+  it('recognizes web addresses', () => {
+    for (const u of ['example.com', 'en.wikipedia.org/wiki/Commodore_Amiga', 'https://x.org/a?b=1', 'www.bbc.co.uk', 'lite.cnn.com'])
+      expect(looksLikeUrl(u)).toBe(true);
+    for (const n of ['calc', 'PRIMES', 'print 2+2', 'ls -l', 'HELLO.BAS', 'notes.txt'])
+      expect(looksLikeUrl(n)).toBe(false);
+  });
+});

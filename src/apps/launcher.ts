@@ -200,6 +200,14 @@ class TileGrid extends Widget {
 
 let current: Window | null = null;
 
+/** example.com, en.wikipedia.org/wiki/X, https://… */
+export function looksLikeUrl(s: string): boolean {
+  if (/^https?:\/\/\S+$/i.test(s)) return true;
+  // NAME.BAS, NOTES.TXT etc. are Orbit files, not web sites
+  if (!s.includes('/') && /\.(bas|txt|wrt|csv|pic|mus|lnk|png|jpe?g|gif|bmp|md|log|ini|json|zip)$/i.test(s)) return false;
+  return /^(www\.)?[\w-]+(\.[\w-]+)*\.[a-z]{2,}(:\d+)?(\/\S*)?$/i.test(s);
+}
+
 function score(it: Item, q: string): number {
   const name = it.label.toLowerCase();
   if (name === q) return 100;
@@ -268,7 +276,7 @@ function openLauncher() {
     walk('/', 0);
     const ranked = all.map((it) => ({ it, s: score(it, q) })).filter((x) => x.s > 0).sort((a, b) => b.s - a.s).map((x) => x.it).slice(0, 40);
     const raw = field.text.trim();
-    if (/^(https?:\/\/|www\.)|^[\w-]+\.[a-z]{2,}(\/\S*)?$/i.test(raw)) {
+    if (looksLikeUrl(raw)) {
       ranked.unshift({ label: `Go to ${raw}`, icon: 'navigator', run: () => launch('browser', { args: { url: raw } }) });
     }
     grid.emptyText = `Press Enter to run "${raw}" in the Console.`;

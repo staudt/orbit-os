@@ -8,6 +8,7 @@ import { ScreenView, runFile } from '../basic';
 import { basename, dirname, extname, joinPath, normPath } from '../../fs/vfs';
 import { C } from '../../core/palette';
 import { COMMANDS, expandGlobs, type ShellCtx } from './commands';
+import { looksLikeUrl } from '../launcher';
 import { invalidate, os } from '../../os';
 
 const COLS = 80, ROWS = 24;
@@ -261,6 +262,11 @@ class Console {
     const firstWord = tokenize(trimmed).words[0] ?? '';
     const isCmd = (w: string) => !!COMMANDS[w.toLowerCase()] || ['run', 'basic'].includes(w.toLowerCase());
     if (!isCmd(firstWord) && !this.findProgram(firstWord)) {
+      if (looksLikeUrl(trimmed)) {
+        this.say(`Opening ${trimmed} in Internet Navigator...\n`, C.GREY);
+        await launch('browser', { args: { url: trimmed } });
+        return;
+      }
       if (await this.tryBasic(trimmed)) return;
       this.say(`osh: command not found: ${firstWord}\n`, C.CRIMSON);
       return;
