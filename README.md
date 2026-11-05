@@ -50,3 +50,6 @@ src/seed   sample programs, documents, tunes and help pages
 1. Create a GitHub repository and push this project to the `main` branch.
 2. In the repository settings, under **Pages**, set **Source** to **GitHub Actions**.
 3. The workflow in `.github/workflows/deploy.yml` runs the sanity checks, builds, and publishes `dist/`. Asset paths are relative, so the site works at `https://<user>.github.io/<repo>/`.
+
+## Credits
+Made by Ricardo Staudt ([x.com/ricardostaudt](https://x.com/ricardostaudt)) and Claude Opus 5.5.

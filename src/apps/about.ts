@@ -25,6 +25,34 @@ export class LogoView extends Widget {
   }
 }
 
+/** A run of text on one line; with a url it's a link that opens in a new browser tab. */
+class Span extends Widget {
+  constructor(private text: string, private url?: string, private color: number = C.INK) {
+    super();
+    if (url) this.cursor = 'hand';
+  }
+  get width() { return SANS.measure(this.text); }
+  paint(g: Gfx) {
+    const c = this.url ? C.MAGENTA : this.color;
+    SANS.draw(g, 0, 1, this.text, c);
+    if (this.url) g.hline(0, this.width - 1, 10, c);
+  }
+  onPointerDown() {
+    if (this.url) window.open(this.url, '_blank', 'noopener');
+    return true;
+  }
+}
+
+/** Lay out spans centered on one line. */
+function spanLine(parent: Widget, y: number, w: number, spans: Span[]) {
+  const total = spans.reduce((t, sp) => t + sp.width, 0);
+  let x = Math.floor((w - total) / 2);
+  for (const sp of spans) {
+    parent.add(sp).setBounds(x, y, sp.width, 12);
+    x += sp.width;
+  }
+}
+
 function openAbout(appId?: string) {
   const app = appId ? getApp(appId) : undefined;
   if (app && app.id !== 'about') {
@@ -39,7 +67,7 @@ function openAbout(appId?: string) {
     win.focusWidget(ok);
     return;
   }
-  const win = new Window({ title: 'About Orbit', icon: 'about', app: 'about', w: 250, h: 162, resizable: false, maximizable: false });
+  const win = new Window({ title: 'About Orbit', icon: 'about', app: 'about', w: 250, h: 200, resizable: false, maximizable: false });
   win.body.add(new LogoView()).setBounds(0, 8, 250, 48);
   const L = os.display.layout;
   const { files } = os.fs.count();
@@ -47,14 +75,16 @@ function openAbout(appId?: string) {
     `Version ${VERSION}`,
     `Screen: ${L.w}×${L.h}, 16 colors, ${L.scale}× pixels`,
     `Orbit HD: ${formatBytes(os.fs.usage())} in ${files} files`,
-    '',
-    'A small personal system for the browser.',
-    'Made with care, square pixels and a sunset.',
   ];
   const lab = win.body.add(new Label(lines.join('\n'), { align: 'center', valign: 'top' }));
-  lab.setBounds(8, 62, 234, 70);
+  lab.setBounds(8, 62, 234, 36);
+  // credits
+  spanLine(win.body, 104, 250, [new Span('Made with care, square pixels and a sunset by', undefined, C.GREY)]);
+  spanLine(win.body, 118, 250, [new Span('Ricardo Staudt  '), new Span('x.com/ricardostaudt', 'https://x.com/ricardostaudt')]);
+  spanLine(win.body, 131, 250, [new Span('and Claude Opus 5.5')]);
+  spanLine(win.body, 150, 250, [new Span('Source: '), new Span('github.com/staudt/orbit-os', 'https://github.com/staudt/orbit-os')]);
   const ok = win.body.add(new Button('OK', () => win.close(), { isDefault: true }));
-  ok.setBounds(97, 138, 56, 16);
+  ok.setBounds(97, 174, 56, 16);
   os.wm.open(win);
   win.focusWidget(ok);
 }

@@ -642,6 +642,12 @@ Orbit is a desktop computer that runs in a web page.
 - Low resolution and 16 colors are on purpose.
 - It was built as a love letter to 90s desktops.
 
+## Credits
+Made by Ricardo Staudt ([x.com/ricardostaudt](https://x.com/ricardostaudt))
+and Claude Opus 5.5.
+
+The source is at [github.com/staudt/orbit-os](https://github.com/staudt/orbit-os).
+
 Have fun. Open the [BASIC page](orbit:help/basic) and write a
 program, or go back to the [start page](orbit:home).
 `,
