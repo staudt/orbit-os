@@ -9,10 +9,12 @@ export interface SeedFile {
   content: string | Uint8Array;
   /** seed version that introduced this file (1 = first release) */
   since?: number;
+  /** seed version that replaces an existing copy once (for files shipped broken) */
+  refresh?: number;
 }
 
 /** Bump when new sample files/shortcuts ship, so existing disks get them too. */
-export const SEED_VERSION = 8;
+export const SEED_VERSION = 9;
 
 /** Files renamed by later versions (applied once when upgrading past `since`). */
 export const SEED_RENAMES: { since: number; from: string; to: string }[] = [
@@ -62,6 +64,7 @@ export async function seedDisk(fs: Vfs, extra: SeedFile[] = []): Promise<boolean
   for (const f of [...SEED_FILES, ...extra]) {
     // only add files introduced after this disk was last seeded; never overwrite
     if ((f.since ?? 1) > have && !fs.exists(f.path)) await fs.write(f.path, f.content);
+    else if (f.refresh && f.refresh > have && have > 0 && fs.exists(f.path)) await fs.write(f.path, f.content);
   }
   await fs.setKV('seeded', true);
   await fs.setKV('seedVersion', SEED_VERSION);

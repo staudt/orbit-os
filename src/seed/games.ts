@@ -10,10 +10,10 @@ import ADVENTUR from './games/adventur.bas?raw';
 export const GAME_SEEDS: SeedFile[] = [
   { path: '/Programs/TANKS.BAS', content: TANKS, since: 7 },
   { path: '/Programs/NITEMAZE.BAS', content: NITEMAZE, since: 7 },
-  { path: '/Programs/TRADER.BAS', content: TRADER, since: 8 },
-  { path: '/Programs/WORM.BAS', content: WORM, since: 8 },
-  { path: '/Programs/MINES.BAS', content: MINES, since: 8 },
-  { path: '/Programs/ADVENTUR.BAS', content: ADVENTUR, since: 8 },
+  { path: '/Programs/TRADER.BAS', content: TRADER, since: 8, refresh: 9 },
+  { path: '/Programs/WORM.BAS', content: WORM, since: 8, refresh: 9 },
+  { path: '/Programs/MINES.BAS', content: MINES, since: 8, refresh: 9 },
+  { path: '/Programs/ADVENTUR.BAS', content: ADVENTUR, since: 8, refresh: 9 },
 ];
 
 /** File names of the games (the Launcher lists these under Games). */

@@ -1,6 +1,7 @@
 import { describe, expect, it } from 'vitest';
 import { IDBFactory } from 'fake-indexeddb';
 import { Vfs } from '../../src/fs/vfs';
+import { seedDisk, SEED_VERSION } from '../../src/fs/seed';
 
 const fresh = () => Vfs.open(new IDBFactory(), 'test');
 
@@ -30,5 +31,24 @@ describe('virtual filesystem', () => {
     a.close();
     const b = await Vfs.open(factory, 'p');
     expect(await b.readText('/X/y/z.txt')).toBe('deep');
+  });
+
+  it('seeds new files once and refreshes broken ones once', async () => {
+    const fs = await fresh();
+    await fs.setKV('seeded', true);
+    await fs.setKV('seedVersion', SEED_VERSION - 1);
+    await fs.write('/Programs/OLD.BAS', 'mine');
+    await fs.write('/Programs/BROKEN.BAS', 'half-written');
+    await seedDisk(fs, [
+      { path: '/Programs/OLD.BAS', content: 'shipped', since: 1 },
+      { path: '/Programs/BROKEN.BAS', content: 'fixed', since: SEED_VERSION - 1, refresh: SEED_VERSION },
+      { path: '/Programs/NEW.BAS', content: 'new', since: SEED_VERSION },
+    ]);
+    expect(await fs.readText('/Programs/OLD.BAS')).toBe('mine');
+    expect(await fs.readText('/Programs/BROKEN.BAS')).toBe('fixed');
+    expect(await fs.readText('/Programs/NEW.BAS')).toBe('new');
+    await fs.write('/Programs/BROKEN.BAS', 'user edit');
+    expect(await seedDisk(fs, [])).toBe(false);
+    expect(await fs.readText('/Programs/BROKEN.BAS')).toBe('user edit');
   });
 });
