@@ -559,6 +559,7 @@ export class WindowManager implements InputSink {
         let f: Widget | null = w;
         while (f && !(f.focusable && f.enabled)) f = f.parent;
         if (f) win.focusWidget(f);
+        if (e.touch && f?.acceptsText) os.input.textTapped();
         if (w.enabled) {
           // bubble the press up until someone handles it, then capture to that widget
           let target: Widget | null = w;

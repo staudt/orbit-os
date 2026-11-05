@@ -61,6 +61,8 @@ export class Input {
   /** a long-press fired: the finger is still down and may slide onto a menu item */
   private longFired = false;
   private touchActive = false;
+  /** set by the WM during a touch press that landed on a text-accepting widget */
+  private tapOnText = false;
 
   constructor(display: Display, kbd: HTMLTextAreaElement) {
     this.display = display;
@@ -115,14 +117,17 @@ export class Input {
 
   setWantText(v: boolean) {
     this.wantText = v;
-    if (this.touchActive) {
-      if (v) this.kbd.focus({ preventScroll: true });
-      else this.kbd.blur();
-    }
+    // on touch screens the keyboard only opens when a text box is tapped (see textTapped), never by itself
+    if (this.touchActive && !v) this.kbd.blur();
+  }
+
+  /** The WM calls this while handling a touch press on a text-accepting widget. */
+  textTapped() {
+    this.tapOnText = true;
   }
 
   focusKbd() {
-    if (this.touchActive && !this.wantText) return;
+    if (this.touchActive) return;
     if (document.activeElement !== this.kbd) this.kbd.focus({ preventScroll: true });
   }
 
@@ -145,8 +150,13 @@ export class Input {
       const near = Math.abs(L.x - x) <= 4 && Math.abs(L.y - y) <= 4;
       const clicks = now - L.t < 450 && near && L.button === button ? L.clicks + 1 : 1;
       this.lastDown = { t: now, x, y, button, clicks };
+      this.tapOnText = false;
       this.sink?.pointer({ ...this.base(e), type, x, y, button, clicks, wheel: 0 });
-      this.focusKbd();
+      if (this.touchActive) {
+        // show the on-screen keyboard only for a tap on a text box; any other tap hides it
+        if (this.tapOnText && this.wantText) this.kbd.focus({ preventScroll: true });
+        else if (document.activeElement === this.kbd) this.kbd.blur();
+      } else this.focusKbd();
       if (this.touchActive && button === 0) {
         this.clearLongPress();
         this.longFired = false;
