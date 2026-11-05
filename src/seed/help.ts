@@ -98,7 +98,7 @@ The desktop shows what is in your /Desktop folder.
   Right-click a button for Restore, Minimize, Maximize and Close.
 
 ## Top bar
-- **Planet menu**: About Orbit, Launcher, Config, Start Screensaver and Restart.
+- **Planet menu**: About Orbit, Launcher, Config, Start Screensaver, Moony and Restart.
 - **App menus**: the menus of the active app.
 - **Disk usage**: click it for details.
 - **Clock**: click for the date and a 24-hour toggle.
@@ -109,6 +109,13 @@ The desktop shows what is in your /Desktop folder.
 - The title-bar boxes minimize, maximize and close.
 - Double-click the title to maximize.
 - Minimized windows wait on the bottom bar; click their button to restore.
+
+## Moony
+Moony is the little moon who gives new users a tour. After the tour Moony
+waits in the top-right corner of the desktop: click Moony for a tip. Point
+at Moony and click the little close box to hide (or right-click, or
+long-press). Bring Moony back from **Launch > System** (Moony Tour or
+Moony's Tips) or from the planet menu (Moony Tour, Show Moony).
 
 ## The screen
 Orbit uses large square pixels. The screen changes shape when you

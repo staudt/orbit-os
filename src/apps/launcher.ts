@@ -63,6 +63,8 @@ const CATEGORIES: Category[] = [
       { label: 'Trash', icon: os.fs.list(TRASH).length ? 'trash-full' : 'trash-empty', keys: 'bin deleted', run: () => launch('files', { path: TRASH }) },
       { label: 'Screensaver', icon: 'orbit', keys: 'screen saver', run: () => setTimeout(() => os.wm.screensaver.start(), 300) },
       { label: 'Help', icon: 'help', keys: 'manual', run: () => launch('browser', { args: { url: 'orbit:help' } }) },
+      { label: 'Moony Tour', icon: 'moony', keys: 'moony moon tour welcome tutorial', run: () => os.wm.moony.startTour() },
+      { label: "Moony's Tips", icon: 'moony', keys: 'moony moon tip tips hints', run: () => os.wm.moony.tipPlease() },
       app('about', 'About Orbit'),
     ]),
   },

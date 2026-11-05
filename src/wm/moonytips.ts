@@ -1,0 +1,21 @@
+/** Tips Moony gives when clicked. Every one describes something Orbit really does. */
+export const TIPS: string[] = [
+  'Hold Ctrl while dragging files to copy them instead of moving them.',
+  'Drag a file onto the Trash icon to delete it, or select it and press Delete.',
+  'Drag across empty desktop space to select several icons; Ctrl+click adds more.',
+  'With no window open, type a few letters to jump to a matching desktop icon.',
+  'Right-click the desktop to clean up icons, change the wallpaper or import files.',
+  'Right-click a window button on the bottom bar to restore, minimize, maximize or close it.',
+  'In Files, press F2 to rename the selected item.',
+  'Drag files from your real computer into an Orbit window to import them.',
+  "Type in the Launcher's Quick Run box to find apps, programs and files fast.",
+  'Config > Saver picks your screensaver. They are BASIC programs in /Screensavers you can edit.',
+  'In Write, Ctrl+F finds text, F3 finds the next match, and Ctrl+H replaces.',
+  'In Draw, hold Shift for perfectly straight lines, squares and circles.',
+  'In Draw, left-click a palette color for the foreground and right-click for the background.',
+  'In Calc, put $ in a reference like =$A$1*B2 to keep it fixed when you copy.',
+  'In BASIC, press F5 to run your program; Ctrl+Pause stops it.',
+  "In Internet Navigator, F6 jumps to the address bar. Type a link's number there to follow it.",
+  'In Console, Up and Down recall old commands and Tab completes file names.',
+  'The Clock app also has an analog face, a stopwatch and a countdown timer.',
+];

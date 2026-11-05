@@ -15,6 +15,7 @@ import { makeWallpaper } from './wallpaper';
 import { launch } from '../apps/registry';
 import { Screensaver } from './screensaver';
 import { Taskbar, TASKBAR_H } from './taskbar';
+import { Moony } from './moony';
 import { invalidate, os } from '../os';
 
 interface ZoomAnim {
@@ -33,6 +34,7 @@ type Drag =
   | { kind: 'desktop' }
   | { kind: 'topbar' }
   | { kind: 'taskbar' }
+  | { kind: 'moony' }
   | { kind: 'swallow' };
 
 const TRAIL = 3;
@@ -58,6 +60,7 @@ export class WindowManager implements InputSink {
   lastPointer: PointerEv | null = null;
   screensaver = new Screensaver();
   taskbar = new Taskbar();
+  moony = new Moony();
   /** files being dragged between windows and the desktop */
   fileDrag: { paths: string[]; icon: string } | null = null;
 
@@ -92,6 +95,7 @@ export class WindowManager implements InputSink {
       }
     }
     this.desktop.layout();
+    this.moony.layout();
     invalidate();
   }
 
@@ -352,6 +356,7 @@ export class WindowManager implements InputSink {
     if (this.wallpaper.w === fb.w && this.wallpaper.h === fb.h) fb.px.set(this.wallpaper.px);
     else this.onScreenResize(), fb.px.set(this.wallpaper.px);
     this.desktop.paint(g);
+    this.moony.paintBelow(g);
     for (const w of this.windows) if (w.visible && w.revealed) w.paint(g);
     const d = this.drag;
     this.phase = Math.floor(performance.now() / 70);
@@ -387,6 +392,7 @@ export class WindowManager implements InputSink {
     this.taskbar.launcherOpen = this.launcherOpen;
     this.taskbar.paint(g);
     this.topbar.paint(g);
+    this.moony.paintAbove(g);
     this.menus.paint(g);
     os.display.present();
   }
@@ -496,6 +502,8 @@ export class WindowManager implements InputSink {
   }
 
   private pointerDown(e: PointerEv) {
+    // a talking Moony floats above everything
+    if (this.moony.onTop && this.moony.down(e)) { this.drag = { kind: 'moony' }; return; }
     if (e.y < TOPBAR_H) {
       this.closePopups();
       this.topbar.pointer(e);
@@ -512,6 +520,8 @@ export class WindowManager implements InputSink {
     const hit = this.windowAt(e.x, e.y);
     if (!hit) {
       this.closePopups();
+      // a parked Moony sits on the desktop, under the windows
+      if (!this.moony.onTop && this.moony.down(e)) { this.drag = { kind: 'moony' }; return; }
       this.drag = { kind: 'desktop' };
       this.desktop.pointer(e);
       return;
@@ -614,6 +624,9 @@ export class WindowManager implements InputSink {
       case 'taskbar':
         this.taskbar.pointer(e);
         break;
+      case 'moony':
+        this.moony.drag(e);
+        break;
     }
   }
 
@@ -646,6 +659,8 @@ export class WindowManager implements InputSink {
   }
 
   private updateHover(e: PointerEv) {
+    this.moony.hover(e.x, e.y, e.y < TOPBAR_H || this.taskbar.contains(e.x, e.y) || !!this.windowAt(e.x, e.y));
+    if (this.moony.onTop && this.moony.hit(e.x, e.y)) { this.setHover(null); this.setCursor('arrow'); return; }
     if (e.y < TOPBAR_H || this.taskbar.contains(e.x, e.y)) { this.setHover(null); this.setCursor('arrow'); return; }
     const hit = this.windowAt(e.x, e.y);
     if (!hit) {
@@ -688,6 +703,7 @@ export class WindowManager implements InputSink {
       if (e.key === 'F10') this.topbar.openMenu(0);
       return;
     }
+    if (!this.active && this.moony.key(e)) return;
     const win = this.active;
     if (win && !win.closed) {
       if (win.focused && win.focused.enabled && win.focused.onKey(e) === true) return;

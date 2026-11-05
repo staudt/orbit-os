@@ -16,6 +16,10 @@ export interface Settings {
   screensaverMinutes: number; // 0 = off
   /** 'cycle', a built-in saver name, or a path to a .BAS program in /Screensavers */
   screensaverMode: string;
+  /** Moony the moon: 'new' = give the welcome tour on next boot */
+  moony: 'new' | 'parked' | 'hidden';
+  /** where Moony was dragged to (logical px), or null for the top-right corner */
+  moonyPos: [number, number] | null;
   /** bumped when defaults change in a way existing users should get */
   settingsVersion: number;
 }
@@ -36,6 +40,8 @@ export const DEFAULT_SETTINGS: Settings = {
   bookmarks: [],
   screensaverMinutes: 5,
   screensaverMode: 'cycle',
+  moony: 'new',
+  moonyPos: null,
   settingsVersion: 2,
 };
 

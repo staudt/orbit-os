@@ -1,6 +1,7 @@
 import { Gfx, Surface, BAYER4 } from './gfx';
 import { C } from './palette';
 import { drawDigit } from './sevenseg';
+import { drawMoon } from './moonart';
 
 const TR = 255;
 
@@ -78,7 +79,16 @@ export function clockIcon(size: 16 | 32): Surface {
   return s;
 }
 
+/** Moony, as a launcher icon (with the face only at the big size). */
+export function moonyIcon(size: 16 | 32): Surface {
+  const s = new Surface(size, size, TR);
+  const r = size === 32 ? 13 : 6;
+  drawMoon(new Gfx(s), size / 2, size / 2, r, Math.round(r * 1.7), false, 0);
+  return s;
+}
+
 export const PROCEDURAL_ICONS: Record<string, (size: 16 | 32) => Surface> = {
   navigator: navigatorIcon,
   clock: clockIcon,
+  moony: moonyIcon,
 };

@@ -113,6 +113,12 @@ export class Desktop {
     return this.icons.map((ic) => this.hitRect(ic));
   }
 
+  /** Screen rect of the icon whose label matches (case-insensitive), if it is on the desktop. */
+  iconRectByLabel(label: string): Rect | null {
+    const ic = this.icons.find((i) => i.label.toLowerCase() === label.toLowerCase());
+    return ic ? this.hitRect(ic) : null;
+  }
+
   private iconRect(ic: DeskIcon): Rect {
     return { x: ic.x + (CELL_W - 32) / 2, y: ic.y, w: 32, h: 32 };
   }

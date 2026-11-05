@@ -103,9 +103,11 @@ async function boot() {
   invalidate();
   os.sound.sfx('chime');
 
-  if (volatile) {
-    alert('This browser does not allow Orbit to save files, so Orbit HD is a temporary disk this time. Anything you make will be lost when you close the page.', { icon: 'warning', title: 'Temporary Disk' });
-  }
+  // Moony arrives once the dissolve is over (and after the temporary-disk warning, if any)
+  const warned = volatile
+    ? alert('This browser does not allow Orbit to save files, so Orbit HD is a temporary disk this time. Anything you make will be lost when you close the page.', { icon: 'warning', title: 'Temporary Disk' })
+    : Promise.resolve();
+  warned.then(() => setTimeout(() => wm.moony.boot(), volatile ? 0 : 450));
 }
 
 function dissolve(from: Surface) {

@@ -1,4 +1,4 @@
-import type { Gfx } from '../core/gfx';
+import type { Gfx, Rect } from '../core/gfx';
 import { C } from '../core/palette';
 import { SANS } from '../core/fonts';
 import type { KeyEv, PointerEv } from '../core/input';
@@ -75,6 +75,9 @@ export class TopBar {
         { label: 'Launcher…', shortcut: 'F9', action: () => launch('launcher') },
         { label: 'Config…', action: () => launch('config') },
         { label: 'Start Screensaver', action: () => setTimeout(() => os.wm.screensaver.start(), 300) },
+        { separator: true },
+        { label: 'Moony Tour…', action: () => os.wm.moony.startTour() },
+        { label: 'Show Moony', checked: () => os.wm.moony.visible, action: () => (os.wm.moony.visible ? os.wm.moony.hide() : os.wm.moony.show()) },
         { separator: true },
         { label: 'Restart', action: () => location.reload() },
       ],
@@ -169,6 +172,12 @@ export class TopBar {
     // drop menus that don't fit (they remain reachable via keyboard shortcuts)
     const limit = rx - 4;
     this.items = this.items.filter((it) => it.x + it.w <= limit);
+  }
+
+  /** Screen rect of a left-side menu title (0 = the Orbit logo). */
+  itemRect(i: number): Rect | null {
+    const it = this.items[i];
+    return it ? { x: it.x, y: 0, w: it.w, h: TOPBAR_H - 1 } : null;
   }
 
   private all(): BarItem[] {
